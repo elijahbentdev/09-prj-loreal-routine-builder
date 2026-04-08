@@ -1,5 +1,5 @@
-const WORKER_URL = "https://fluxbotcca.elijah-bent.workers.dev";
-const STORAGE_KEY = 'loreal_selected_ids';
+const WORKER_URL = "https://gcabot2.elijah-bent.workers.dev";
+const STORAGE_KEY = "loreal_selected_ids";
 const SYSTEM_PROMPT = `You are a luxury beauty advisor for L'Oréal and its family of brands (CeraVe, La Roche-Posay, Garnier, L'Oréal Paris, Lancôme, Kérastase, etc.). 
 
 Your role is to:
@@ -22,8 +22,8 @@ const generateRoutineBtn = document.getElementById("generateRoutine");
 const clearAllBtn = document.getElementById("clearAllSelections");
 const chatForm = document.getElementById("chatForm");
 const chatWindow = document.getElementById("chatWindow");
-const rtlToggleBtn = document.getElementById('rtlToggle');
-const webSearchToggleBtn = document.getElementById('webSearchToggle');
+const rtlToggleBtn = document.getElementById("rtlToggle");
+const webSearchToggleBtn = document.getElementById("webSearchToggle");
 
 /* State Variables */
 let allProducts = [];
@@ -55,11 +55,11 @@ async function loadProducts() {
 async function init() {
   allProducts = await loadProducts();
   selectedIds = loadSelections();
-  
+
   // RTL initialization
-  if (localStorage.getItem('loreal_rtl') === 'rtl') {
-    document.documentElement.dir = 'rtl';
-    document.documentElement.lang = 'ar';
+  if (localStorage.getItem("loreal_rtl") === "rtl") {
+    document.documentElement.dir = "rtl";
+    document.documentElement.lang = "ar";
   }
 
   restoreChips();
@@ -68,9 +68,10 @@ async function init() {
 
 /* --- Rendering Products --- */
 function getFilteredProducts(category, searchTerm) {
-  return allProducts.filter(p => {
+  return allProducts.filter((p) => {
     const matchCat = !category || p.category === category;
-    const matchSearch = !searchTerm || 
+    const matchSearch =
+      !searchTerm ||
       p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.description.toLowerCase().includes(searchTerm.toLowerCase());
     return matchCat && matchSearch;
@@ -97,9 +98,10 @@ function renderProducts() {
     return;
   }
 
-  productsContainer.innerHTML = filteredProducts.map(product => {
-    const isSelected = selectedIds.has(product.id);
-    return `
+  productsContainer.innerHTML = filteredProducts
+    .map((product) => {
+      const isSelected = selectedIds.has(product.id);
+      return `
       <div class="product-card" data-id="${product.id}" data-selected="${isSelected}">
         <div class="product-img-wrapper">
           <img src="${product.image}" alt="${product.name}" loading="lazy" />
@@ -120,16 +122,17 @@ function renderProducts() {
         </div>
       </div>
     `;
-  }).join('');
+    })
+    .join("");
 }
 
 /* --- Listeners for Filtering --- */
-categoryFilter.addEventListener('change', () => {
+categoryFilter.addEventListener("change", () => {
   productSearch.value = ""; // Clear search when category changes
   renderProducts();
 });
 
-productSearch.addEventListener('input', () => {
+productSearch.addEventListener("input", () => {
   clearTimeout(searchDebounceTimeout);
   searchDebounceTimeout = setTimeout(() => {
     renderProducts();
@@ -137,17 +140,17 @@ productSearch.addEventListener('input', () => {
 });
 
 /* --- Interactions: Cards and Overlays --- */
-productsContainer.addEventListener('click', (e) => {
-  const card = e.target.closest('.product-card');
+productsContainer.addEventListener("click", (e) => {
+  const card = e.target.closest(".product-card");
   if (!card) return;
 
-  const infoBtn = e.target.closest('.desc-toggle-btn');
+  const infoBtn = e.target.closest(".desc-toggle-btn");
   if (infoBtn) {
     e.stopPropagation(); // prevent card selection
-    const overlay = card.querySelector('.product-desc-overlay');
-    overlay.classList.toggle('visible');
-    const isVisible = overlay.classList.contains('visible');
-    overlay.setAttribute('aria-hidden', !isVisible);
+    const overlay = card.querySelector(".product-desc-overlay");
+    overlay.classList.toggle("visible");
+    const isVisible = overlay.classList.contains("visible");
+    overlay.setAttribute("aria-hidden", !isVisible);
     return;
   }
 
@@ -162,7 +165,7 @@ productsContainer.addEventListener('click', (e) => {
     selectedIds.add(productId);
     card.dataset.selected = "true";
   }
-  
+
   saveSelections();
   restoreChips();
 });
@@ -176,13 +179,15 @@ function restoreChips() {
         Click products above to add them to your routine.
       </p>
     `;
-    clearAllBtn.style.display = 'none';
+    clearAllBtn.style.display = "none";
     return;
   }
 
-  const selectedProducts = allProducts.filter(p => selectedIds.has(p.id));
-  
-  selectedProductsList.innerHTML = selectedProducts.map(p => `
+  const selectedProducts = allProducts.filter((p) => selectedIds.has(p.id));
+
+  selectedProductsList.innerHTML = selectedProducts
+    .map(
+      (p) => `
     <div class="selected-chip" data-id="${p.id}">
       <img src="${p.image}" alt="${p.name}" />
       <span>${p.name}</span>
@@ -190,87 +195,88 @@ function restoreChips() {
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
-  `).join('');
+  `,
+    )
+    .join("");
 
-  clearAllBtn.style.display = 'inline-block';
+  clearAllBtn.style.display = "inline-block";
 }
 
-selectedProductsList.addEventListener('click', (e) => {
-  const removeBtn = e.target.closest('.remove-chip-btn');
+selectedProductsList.addEventListener("click", (e) => {
+  const removeBtn = e.target.closest(".remove-chip-btn");
   if (!removeBtn) return;
-  
-  const chip = removeBtn.closest('.selected-chip');
+
+  const chip = removeBtn.closest(".selected-chip");
   const productId = parseInt(chip.dataset.id, 10);
-  
+
   selectedIds.delete(productId);
   saveSelections();
   restoreChips();
-  
+
   // Re-render UI to update card styling if it's currently visible
   renderProducts();
 });
 
-clearAllBtn.addEventListener('click', () => {
+clearAllBtn.addEventListener("click", () => {
   selectedIds.clear();
   saveSelections();
   restoreChips();
   renderProducts(); // Update visual state of all cards
 });
 
-
 /* --- UI Utilities --- */
 function shakeButton() {
-  generateRoutineBtn.classList.remove('shake');
+  generateRoutineBtn.classList.remove("shake");
   void generateRoutineBtn.offsetWidth; // trigger reflow
-  generateRoutineBtn.classList.add('shake');
+  generateRoutineBtn.classList.add("shake");
 }
 
 function showToast(message) {
   // Remove existing toast if any
-  const existing = document.querySelector('.toast-msg');
+  const existing = document.querySelector(".toast-msg");
   if (existing) existing.remove();
 
-  const toast = document.createElement('div');
-  toast.className = 'toast-msg';
+  const toast = document.createElement("div");
+  toast.className = "toast-msg";
   toast.textContent = message;
   document.body.appendChild(toast);
 
   // Trigger animation
-  requestAnimationFrame(() => toast.classList.add('show'));
-  
+  requestAnimationFrame(() => toast.classList.add("show"));
+
   setTimeout(() => {
-    toast.classList.remove('show');
+    toast.classList.remove("show");
     setTimeout(() => toast.remove(), 300);
   }, 3000);
 }
 
 function displayMessage(role, text) {
-  const placeholder = chatWindow.querySelector('.placeholder-message');
+  const placeholder = chatWindow.querySelector(".placeholder-message");
   if (placeholder) placeholder.remove();
 
-  const msgDiv = document.createElement('div');
-  msgDiv.classList.add('chat-message', `chat-message--${role}`);
-  
+  const msgDiv = document.createElement("div");
+  msgDiv.classList.add("chat-message", `chat-message--${role}`);
+
   // Convert markdown to simple HTML bold + breaks
   const formatted = text
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\n/g, '<br>');
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\n/g, "<br>");
 
   msgDiv.innerHTML = `
     <div class="message-bubble">
-      ${role === 'assistant' ? '<span class="ai-label">AI Advisor</span>' : ''}
+      ${role === "assistant" ? '<span class="ai-label">AI Advisor</span>' : ""}
       <div class="message-text">${formatted}</div>
     </div>
   `;
-  
+
   chatWindow.appendChild(msgDiv);
-  chatWindow.scrollTo({ top: chatWindow.scrollHeight, behavior: 'smooth' });
+  chatWindow.scrollTo({ top: chatWindow.scrollHeight, behavior: "smooth" });
 }
 
 function showTypingIndicator() {
-  const indicator = document.createElement('div');
-  indicator.id = 'typingIndicator';
-  indicator.className = 'chat-message chat-message--assistant typing';
+  const indicator = document.createElement("div");
+  indicator.id = "typingIndicator";
+  indicator.className = "chat-message chat-message--assistant typing";
   indicator.innerHTML = `
     <div class="message-bubble">
       <span class="ai-label">AI Advisor</span>
@@ -280,14 +286,13 @@ function showTypingIndicator() {
     </div>
   `;
   chatWindow.appendChild(indicator);
-  chatWindow.scrollTo({ top: chatWindow.scrollHeight, behavior: 'smooth' });
+  chatWindow.scrollTo({ top: chatWindow.scrollHeight, behavior: "smooth" });
 }
 
 function removeTypingIndicator() {
-  const el = document.getElementById('typingIndicator');
+  const el = document.getElementById("typingIndicator");
   if (el) el.remove();
 }
-
 
 /* --- API Communication --- */
 async function callOpenAI(messages, webSearch = false) {
@@ -295,59 +300,64 @@ async function callOpenAI(messages, webSearch = false) {
   if (webSearch) {
     body.tools = [{ type: "web_search_preview" }];
   }
-  
+
   const response = await fetch(WORKER_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body)
+    body: JSON.stringify(body),
   });
   const data = await response.json();
-  
+
   // Handle tool-use response which may differ from standard choice
-  if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
+  if (
+    data.choices &&
+    data.choices[0] &&
+    data.choices[0].message &&
+    data.choices[0].message.content
+  ) {
     return data.choices[0].message.content;
   }
   // Fallback: extract text from tool-augmented response
   if (data.output) {
     return data.output
-      .filter(b => b.type === "message")
-      .flatMap(b => b.content || [])
-      .filter(c => c && c.type === "output_text")
-      .map(c => c.text)
-      .join('\n');
+      .filter((b) => b.type === "message")
+      .flatMap((b) => b.content || [])
+      .filter((c) => c && c.type === "output_text")
+      .map((c) => c.text)
+      .join("\n");
   }
   return "I couldn't retrieve current information at this time. Please try again.";
 }
 
 /* --- Routine Generation --- */
-generateRoutineBtn.addEventListener('click', async () => {
+generateRoutineBtn.addEventListener("click", async () => {
   if (selectedIds.size === 0) {
     shakeButton();
     showToast("Please select at least one product first!");
     return;
   }
 
-  const selected = allProducts.filter(p => selectedIds.has(p.id));
-  const productList = selected.map(p =>
-    `- ${p.name} by ${p.brand} (${p.category}): ${p.description}`
-  ).join('\n');
+  const selected = allProducts.filter((p) => selectedIds.has(p.id));
+  const productList = selected
+    .map((p) => `- ${p.name} by ${p.brand} (${p.category}): ${p.description}`)
+    .join("\n");
 
   const userMessage = `Please create a personalized beauty routine using these products I've selected:\n\n${productList}\n\nCreate a step-by-step routine that tells me exactly when and how to use each product.`;
 
   conversationHistory = [
     { role: "system", content: SYSTEM_PROMPT },
-    { role: "user", content: userMessage }
+    { role: "user", content: userMessage },
   ];
 
   displayMessage("assistant", "Crafting your personalized routine…");
   showTypingIndicator();
-  
+
   try {
     const reply = await callOpenAI(conversationHistory, useWebSearch);
-    
-    const allMsgs = chatWindow.querySelectorAll('.chat-message--assistant');
+
+    const allMsgs = chatWindow.querySelectorAll(".chat-message--assistant");
     if (allMsgs.length > 0) {
-      allMsgs[allMsgs.length - 1].remove(); 
+      allMsgs[allMsgs.length - 1].remove();
     }
     removeTypingIndicator();
 
@@ -366,14 +376,14 @@ chatForm.addEventListener("submit", async (e) => {
   const input = document.getElementById("userInput");
   const userText = input.value.trim();
   if (!userText) return;
-  
+
   input.value = "";
   displayMessage("user", userText);
-  
+
   conversationHistory.push({ role: "user", content: userText });
-  
+
   showTypingIndicator();
-  
+
   try {
     const reply = await callOpenAI(conversationHistory, useWebSearch);
     conversationHistory.push({ role: "assistant", content: reply });
@@ -386,25 +396,22 @@ chatForm.addEventListener("submit", async (e) => {
   }
 });
 
-
 /* --- Bonus Features: Web Search Toggle --- */
-webSearchToggleBtn.addEventListener('click', () => {
+webSearchToggleBtn.addEventListener("click", () => {
   useWebSearch = !useWebSearch;
-  webSearchToggleBtn.classList.toggle('active', useWebSearch);
-  webSearchToggleBtn.innerHTML = useWebSearch 
+  webSearchToggleBtn.classList.toggle("active", useWebSearch);
+  webSearchToggleBtn.innerHTML = useWebSearch
     ? '<i class="fa-solid fa-globe"></i> Search Web: On'
     : '<i class="fa-solid fa-globe"></i> Search Web: Off';
 });
 
-
 /* --- Bonus Features: RTL Toggle --- */
-rtlToggleBtn.addEventListener('click', () => {
-  const isRTL = document.documentElement.dir === 'rtl';
-  document.documentElement.dir = isRTL ? 'ltr' : 'rtl';
-  document.documentElement.lang = isRTL ? 'en' : 'ar';
-  localStorage.setItem('loreal_rtl', isRTL ? '' : 'rtl');
+rtlToggleBtn.addEventListener("click", () => {
+  const isRTL = document.documentElement.dir === "rtl";
+  document.documentElement.dir = isRTL ? "ltr" : "rtl";
+  document.documentElement.lang = isRTL ? "en" : "ar";
+  localStorage.setItem("loreal_rtl", isRTL ? "" : "rtl");
 });
-
 
 /* Initialize application */
 init();
