@@ -260,6 +260,10 @@ function displayMessage(role, text) {
   // Convert markdown to simple HTML bold + breaks
   const formatted = text
     .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(
+      /\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g,
+      '<a href="$2" target="_blank" class="chat-link">$1</a>',
+    )
     .replace(/\n/g, "<br>");
 
   msgDiv.innerHTML = `
