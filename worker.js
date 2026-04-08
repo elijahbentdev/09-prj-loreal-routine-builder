@@ -55,6 +55,7 @@ export default {
     const requestBody = {
       model: "gpt-4o",
       messages: userInput.messages,
+      ...(userInput.tools ? { tools: userInput.tools } : {}),
       max_completion_tokens: 300,
     };
 
